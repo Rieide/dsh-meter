@@ -1,0 +1,5 @@
+# dsh-meter bundle patch: inserts its plugin row into the web profile roster.
+# Install with: dsh plugin --profile web add <path-or-git-url>
+- insert:
+    - id: dsh-meter
+      name: 'dsh-meter'
