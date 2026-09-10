@@ -6,7 +6,8 @@ const name = "dsh-meter";
 // Hard dependencies; `agentDefaultModel` is read optionally for the default family.
 const inject = ["webServer", "sessionQuery", "credentials", "shell"];
 
-// Beijing peak windows (minutes of day): 09:00-12:00, 14:00-18:00. Everything else is off-peak (half price).
+// Beijing peak windows (minutes of day): Mon-Fri 09:00-12:00, 14:00-18:00.
+// Weekends are entirely off-peak; off-peak price is half the peak price.
 const PEAK_WINDOWS = [
   { s: 540, e: 720 },
   { s: 840, e: 1080 },
@@ -17,11 +18,11 @@ const OFF_WINDOWS = [
   { s: 1080, e: 1440 },
 ];
 
-// CNY per 1M tokens (official pricing, peak/off-peak since 2026-08-16).
+// CNY per 1M tokens (official pricing; flash = DeepSeek-V4.1-Flash).
 const PRICING = {
   flash: {
-    off: { hit: 0.05, miss: 1.5, out: 4.5 },
-    peak: { hit: 0.1, miss: 3.0, out: 9.0 },
+    off: { hit: 0.02, miss: 1.0, out: 4.0 },
+    peak: { hit: 0.04, miss: 2.0, out: 8.0 },
   },
   pro: {
     off: { hit: 0.15, miss: 4.5, out: 13.5 },
@@ -41,7 +42,10 @@ function beijingMinute(ms) {
 }
 
 function windowOf(ms) {
-  const m = beijingMinute(ms);
+  const d = new Date(ms + 8 * 3600e3);
+  const day = d.getUTCDay(); // Beijing weekday: 0=Sun .. 6=Sat
+  const m = d.getUTCHours() * 60 + d.getUTCMinutes();
+  if (day === 0 || day === 6) return { status: "off", start: 0, end: 1440 }; // weekend: all-day off-peak
   for (const w of PEAK_WINDOWS) if (m >= w.s && m < w.e) return { status: "peak", start: w.s, end: w.e };
   for (const w of OFF_WINDOWS) if (m >= w.s && m < w.e) return { status: "off", start: w.s, end: w.e };
   return { status: "off", start: 0, end: 1440 };
