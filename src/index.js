@@ -321,7 +321,9 @@ function apply(ctx) {
         env: { DEEPSEEK_API_KEY: key },
         timeoutMs: 20000,
       });
-      const res = await ctx.shell.run(spec);
+      const res = typeof ctx.shell.run === "function"
+        ? await ctx.shell.run(spec) // older shells
+        : await (await ctx.shell.execute(spec)).result(); // 0.1.7 seam
       const text = res && res.stdout ? res.stdout.text : "";
       if (res.exitCode !== 0 || !text) {
         return { ok: false, error: "余额查询失败（exit " + String(res.exitCode) + "）" };
