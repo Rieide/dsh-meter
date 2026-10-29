@@ -82,12 +82,12 @@ window.__ModuleLoader__.load({
           title:
             "北京时间" +
             ruleHint +
-            "高峰窗口：09:00-12:00、14:00-18:00（高峰价）；其余为低峰（半价）。\n高峰规则随价位表时段变化。",
+            "高峰窗口：09:00-12:00、14:00-18:00（高峰价）；其余为低谷（半价）。\n高峰规则随价位表时段变化。",
         },
         React.createElement(
           "span",
           { className: "dsm-chip-v" },
-          (peak ? "高峰 " : "低峰 ") + hhmm(w.start) + "-" + hhmm(w.end),
+          (peak ? "高峰 " : "低谷 ") + hhmm(w.start) + "-" + hhmm(w.end),
         ),
       );
     }
@@ -102,7 +102,7 @@ window.__ModuleLoader__.load({
       }
       const status = props.status;
       const cur = windowOf(props.now, props.rule).status === "peak" ? "peak" : "off";
-      const curTier = cur === "peak" ? "高峰价" : "低峰价";
+      const curTier = cur === "peak" ? "高峰价" : "低谷价";
       const up = status.currentPricing[cur];
       const rows = status.rows || [];
       const rowLines = rows.map((r) => {
@@ -148,7 +148,7 @@ window.__ModuleLoader__.load({
           "— 合计 —",
           "费用：高峰段 ¥" +
             fmtCny(status.cost.peak) +
-            " + 低峰段 ¥" +
+            " + 低谷段 ¥" +
             fmtCny(status.cost.off) +
             " = ¥" +
             fmtCny(status.cost.total),
